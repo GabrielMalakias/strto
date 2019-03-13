@@ -1,0 +1,5 @@
+<body>
+<link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+ <%= render @view_module, @view_template, assigns %>
+<script src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+</body>
