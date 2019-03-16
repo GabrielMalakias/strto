@@ -16,6 +16,7 @@ pipeline {
         container('helm') {
           git url: 'git://github.com/GabrielMalakias/strto'
             sh '''
+            echo "bla"
             mix -v
             mix local.hex --force
             mix local.rebar --force
