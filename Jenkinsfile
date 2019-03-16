@@ -1,23 +1,11 @@
 pipeline {
-    agent { dockerfile true }
-
+    agent {
+        docker { image 'node:7-alpine' }
+    }
     stages {
-        stage('Checkout files') {
-            checkout scm
-        }
-        stage('Build') {
-            steps {
-              mix -v
-            }
-        }
         stage('Test') {
             steps {
-                echo 'Testing....'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
+                sh 'node --version'
             }
         }
     }
