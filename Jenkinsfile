@@ -17,6 +17,12 @@ pipeline {
           git url: 'git://github.com/GabrielMalakias/strto'
             sh '''
             mix -v
+            mix local.hex --force
+            mix local.rebar --force
+            mix deps.get
+            mix deps.compile
+            mix compile
+            MIX_ENV=test mix compile
             '''
         }
       }
