@@ -15,7 +15,8 @@ pipeline {
       container('helm') {
         git url: 'git://github.com/GabrielMalakias/strto'
           sh '''
-          sh 'mix -v'
+          mix -v
+          '''
       }
     }
   }
