@@ -4,7 +4,7 @@ pipeline {
       label 'pod'
         containerTemplate {
           name 'helm'
-            image 'wardviaene/helm-s3'
+            image 'docker:dind'
             ttyEnabled true
             command 'cat'
         }
