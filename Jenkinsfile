@@ -3,7 +3,7 @@ pipeline {
     kubernetes {
       label 'pod'
         containerTemplate {
-          name 'helm'
+            name 'helm'
             image 'elixir:1.8.1'
             ttyEnabled true
             command 'cat'
@@ -23,6 +23,8 @@ pipeline {
             mix deps.compile
             mix compile
             MIX_ENV=test mix compile
+            mix format --check-formatted
+            mix test
             '''
         }
       }
