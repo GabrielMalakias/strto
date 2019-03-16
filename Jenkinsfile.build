@@ -1,9 +1,11 @@
-agent {
+pipeline {
+  agent {
     dockerfile {
-        filename './build/Dockerfile.build'
+      filename './build/Dockerfile.build'
         dir 'build'
         label 'my-defined-label'
         additionalBuildArgs  '--build-arg version=latest'
         args '-v /tmp:/tmp'
     }
+  }
 }
