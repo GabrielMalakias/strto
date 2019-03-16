@@ -4,7 +4,7 @@ pipeline {
       label 'pod'
         containerTemplate {
             name 'helm'
-            image '_/docker'
+            image 'elixir:1.8.1'
             ttyEnabled true
             command 'cat'
         }
@@ -16,7 +16,14 @@ pipeline {
         container('helm') {
           git url: 'git://github.com/GabrielMalakias/strto'
             sh '''
-            docker build -f ./build/Dockerfile.build
+            mix -v
+            mix local.hex --force
+            mix local.rebar --force
+            mix deps.get
+            mix deps.compile
+            mix compile
+            MIX_ENV=test mix compile
+            mix test
             '''
         }
       }

@@ -1,31 +1,23 @@
 pipeline {
   agent {
     kubernetes {
-      label 'helm-pod'
-      containerTemplate {
-         name 'helm'
-         image 'elixir:1.8.1'
-         ttyEnabled true
-         command 'cat'
-      }
+      label 'pod'
+        containerTemplate {
+            name 'helm'
+            image '_/docker'
+            ttyEnabled true
+            command 'cat'
+        }
     }
   }
   stages {
-    stage('Run helm') {
+    stage('Run tests') {
       steps {
         container('helm') {
           git url: 'git://github.com/GabrielMalakias/strto'
-          sh '''
-          echo "bla"
-          mix deps.get --only prod
-          MIX_ENV=prod mix compile
-          cd assets
-          node run deploy
-          cd ..
-          mix phx.digest
-          MIX_ENV=prod mix release
-          docker -v
-          '''
+            sh '''
+            docker build -f ./build/Dockerfile.build
+            '''
         }
       }
     }
