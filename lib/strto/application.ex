@@ -9,7 +9,7 @@ defmodule Strto.Application do
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-      Strto.Repo,
+      #Strto.Repo,
       # Start the endpoint when the application starts
       StrtoWeb.Endpoint
       # Starts a worker by calling: Strto.Worker.start_link(arg)
