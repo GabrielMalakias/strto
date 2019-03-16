@@ -15,7 +15,6 @@ defmodule StrtoWeb.Router do
     get "/", PageController, :index
   end
 
-
   pipeline :api do
     plug :accepts, ["json"]
   end
