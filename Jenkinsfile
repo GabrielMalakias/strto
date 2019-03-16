@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+              mix -v
               mix deps.get --only prod
               MIX_ENV=prod mix compile
               cd assets
