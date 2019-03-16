@@ -4,7 +4,7 @@ pipeline {
       label 'pod'
         containerTemplate {
             name 'helm'
-            image '_/docker'
+            image 'elixir:1.8.1'
             ttyEnabled true
             command 'cat'
         }

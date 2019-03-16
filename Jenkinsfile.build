@@ -1,6 +1,12 @@
 pipeline {
-  agent { label 'docker' }
-  stages {
+  agent {
+    kubernetes {
+      label 'pod'
+        containerTemplate {
+          name 'helm'
+        }
+    }
+    stages {
     stage('Build') {
       steps {
         sh 'docker build -f "Dockerfile-terraform" -t brightbox/terraform:latest .'
