@@ -1,0 +1,19 @@
+FROM elixir:1.8.0-alpine
+
+RUN apk add --update grep
+
+RUN apk update && \
+    apk --no-cache --update add libgcc libstdc++ && \
+    apk add curl postgresql-client && \
+    rm -rf /var/cache/apk/*
+
+ENV PORT=4000 MIX_ENV=prod REPLACE_OS_VARS=true SHELL=/bin/sh
+
+ADD entrypoint.sh ./entrypoint.sh
+ADD strto.tar.gz ./
+RUN chown -R default ./releases
+
+USER default
+
+EXPOSE 4000
+ENTRYPOINT ["./entrypoint.sh"]

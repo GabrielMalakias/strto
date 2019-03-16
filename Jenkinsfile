@@ -29,10 +29,5 @@ pipeline {
         }
       }
     }
-    stage('Run helm') {
-      steps {
-        echo "Testing..."
-      }
-    }
   }
 }
