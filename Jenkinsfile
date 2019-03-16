@@ -1,12 +1,27 @@
 pipeline {
-    agent {
-        docker { image 'node:7-alpine' }
+  agent {
+    kubernetes {
+      label 'pod'
+      containerTemplate {
+        name 'helm'
+        image 'elixir:1.8.1'
+        ttyEnabled true
+        command 'cat'
+      }
     }
-    stages {
-        stage('Test') {
-            steps {
-                sh 'node --version'
-            }
-        }
+  }
+  stage('Run tests') {
+    steps {
+      container('helm') {
+        git url: 'git://github.com/GabrielMalakias/strto'
+          sh '''
+          sh 'mix -v'
+      }
     }
+  }
+  stage('Run helm') {
+    steps {
+      echo "Testing..."
+    }
+  }
 }
