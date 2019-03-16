@@ -23,7 +23,6 @@ pipeline {
             mix deps.compile
             mix compile
             MIX_ENV=test mix compile
-            mix format --check-formatted
             mix test
             '''
         }
