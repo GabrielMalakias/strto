@@ -9,7 +9,6 @@ pipeline {
               cd assets
               node run deploy
               cd ..
-              mix phx.digest
             }
         }
         stage('Test') {
