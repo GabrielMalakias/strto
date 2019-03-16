@@ -1,10 +1,15 @@
 pipeline {
-    agent any
+    agent { dockerfile true }
 
     stages {
         stage('Build') {
             steps {
-                echo 'Building..'
+              mix deps.get --only prod
+              MIX_ENV=prod mix compile
+              cd assets
+              node run deploy
+              cd ..
+              mix phx.digest
             }
         }
         stage('Test') {
