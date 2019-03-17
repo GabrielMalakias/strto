@@ -13,7 +13,8 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        @echo "**** Compile and Create Build artifact  ****";\
+        sh '''
+        echo "**** Compile and Create Build artifact  ****";\
 	docker build -t strto-build -f build/Dockerfile.build . ;\
 	echo "**** Copies Build Artifact from build step and bakes final image ****";\
 	CONTAINER_ID=$$(docker create strto-build);\
@@ -22,6 +23,7 @@ pipeline {
 	docker build -t ${AWS_DOCKER_IMAGE} -f build/Dockerfile.release .;\
 	echo "**** Push docker image to AWS registry ****";\
 	docker push ${AWS_DOCKER_IMAGE};\
+        '''
       }
     }
     stage('Publish') {
