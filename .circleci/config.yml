@@ -65,8 +65,8 @@ jobs:
       - image: google/cloud-sdk
     environment:
       - PROJECT_NAME: "strto"
-      - GOOGLE_PROJECT_ID: "yggdrasil"
-      - GOOGLE_COMPUTE_ZONE: "us-central1"
+      - GOOGLE_PROJECT_ID: "strto"
+      - GOOGLE_COMPUTE_ZONE: "us-central1-a"
       - GOOGLE_CLUSTER_NAME: "standard-cluster-1"
     steps:
       - checkout
