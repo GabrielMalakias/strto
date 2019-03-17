@@ -56,10 +56,6 @@ jobs:
           command: mix format --check-formatted
 
       - run:
-          name: Run credo
-          command: mix credo -c .credo.exs --strict
-
-      - run:
           name: Run tests
           environment:
             DATABASE_URL: "postgres://postgres@localhost:5432/strto_test"
