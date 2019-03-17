@@ -1,0 +1,69 @@
+version: 2
+jobs:
+  test:
+     docker:
+      - image: bitwalker/alpine-elixir:1.8.0
+      - image: circleci/postgres:9.6
+        environment:
+          POSTGRES_USER: postgres
+    working_directory: ~/strto
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v6-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - v6-mix-cache-{{ .Branch }}
+            - v6-mix-cache
+      - restore_cache:
+          keys:
+            - v6-build-cache-{{ .Branch }}
+            - v6-build-cache      - run:
+
+       - run:
+          name: Install hex / rebar / dependencies
+          command: |
+            mix local.hex --force
+            mix local.rebar --force
+            mix deps.get
+            mix deps.compile
+            mix compile
+            MIX_ENV=test mix compile
+
+      - save_cache:
+          key: v6-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths: "deps"
+      - save_cache:
+          key: v6-mix-cache-{{ .Branch }}
+          paths: "deps"
+      - save_cache:
+          key: v6-mix-cache
+          paths: "deps"
+      - save_cache:
+          key: v6-build-cache-{{ .Branch }}
+          paths:
+            - _build
+            - ~/.mix
+      - save_cache:
+          key: v6-build-cache
+          paths:
+            - _build
+            - ~/.mix
+
+      - run:
+          name: Run format checker
+          command: mix format --check-formatted
+
+      - run:
+          name: Run credo
+          command: mix credo -c .credo.exs --strict
+
+      - run:
+          name: Run tests
+          environment:
+            DATABASE_URL: "postgres://postgres@localhost:5432/strto_test"
+          command: mix test
+workflows:
+  version: 2
+  ultimate_pipeline:
+    jobs:
+      - test
