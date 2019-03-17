@@ -13,8 +13,15 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'docker build -f "Dockerfile-terraform" -t brightbox/terraform:latest .'
-          sh 'docker build -f "Dockerfile-cli" -t brightbox/cli:latest .'
+        @echo "**** Compile and Create Build artifact  ****";\
+	docker build -t strto-build -f build/Dockerfile.build . ;\
+	echo "**** Copies Build Artifact from build step and bakes final image ****";\
+	CONTAINER_ID=$$(docker create strto-build);\
+	docker cp $$CONTAINER_ID:/opt/app/_build/prod/rel/insights/releases/0.0.1/strto.tar.gz . ;\
+	docker rm -v $$CONTAINER_ID;\
+	docker build -t ${AWS_DOCKER_IMAGE} -f build/Dockerfile.release .;\
+	echo "**** Push docker image to AWS registry ****";\
+	docker push ${AWS_DOCKER_IMAGE};\
       }
     }
     stage('Publish') {

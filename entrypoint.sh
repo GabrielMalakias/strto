@@ -1,6 +1,6 @@
 #!/bin/sh
 if [ "$#" -eq 0 ];
 then
-REPLACE_OS_VARS=true /opt/app/bin/strto foreground
+  PORT=4001 _build/prod/rel/strto/bin/strto foreground
 fi
 exec "$@"

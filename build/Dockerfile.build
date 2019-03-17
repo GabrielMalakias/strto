@@ -20,4 +20,9 @@ RUN mix deps.get \
 
 COPY . .
 
+cd assets
+node node_modules/brunch/bin/brunch build --production
+cd ..
+mix phx.digest
+
 RUN mix release --env=prod --verbose
