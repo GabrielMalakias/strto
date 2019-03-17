@@ -10,6 +10,7 @@ jobs:
     working_directory: ~/strto
     steps:
       - checkout
+
       - restore_cache:
           keys:
             - v6-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
@@ -18,9 +19,9 @@ jobs:
       - restore_cache:
           keys:
             - v6-build-cache-{{ .Branch }}
-            - v6-build-cache      - run:
+            - v6-build-cache
 
-       - run:
+      - run:
           name: Install hex / rebar / dependencies
           command: |
             mix local.hex --force
@@ -63,8 +64,9 @@ jobs:
           environment:
             DATABASE_URL: "postgres://postgres@localhost:5432/strto_test"
           command: mix test
+
 workflows:
   version: 2
-  ultimate_pipeline:
+  test_build_and_deploy:
     jobs:
       - test
