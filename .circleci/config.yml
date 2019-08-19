@@ -1,14 +1,16 @@
 version: 2
 jobs:
-  test:
-     docker:
+  install_dependencies_and_test:
+    docker:
       - image: bitwalker/alpine-elixir:1.8.0
       - image: circleci/postgres:9.6
         environment:
           POSTGRES_USER: postgres
+
     working_directory: ~/strto
     steps:
       - checkout
+
       - restore_cache:
           keys:
             - v6-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
@@ -17,9 +19,9 @@ jobs:
       - restore_cache:
           keys:
             - v6-build-cache-{{ .Branch }}
-            - v6-build-cache      - run:
+            - v6-build-cache
 
-       - run:
+      - run:
           name: Install hex / rebar / dependencies
           command: |
             mix local.hex --force
@@ -54,16 +56,48 @@ jobs:
           command: mix format --check-formatted
 
       - run:
-          name: Run credo
-          command: mix credo -c .credo.exs --strict
-
-      - run:
           name: Run tests
           environment:
             DATABASE_URL: "postgres://postgres@localhost:5432/strto_test"
           command: mix test
+  deploy:
+    docker:
+      - image: google/cloud-sdk
+    environment:
+      - PROJECT_NAME: "strto"
+      - GOOGLE_PROJECT_ID: "e-pulsar-234708"
+      - GOOGLE_COMPUTE_ZONE: "us-central1-a"
+      - GOOGLE_CLUSTER_NAME: "standard-cluster-1"
+    steps:
+      - checkout
+      - run:
+          name: Setup Google Cloud SDK
+          command: |
+            apt-get install -qq -y gettext
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+      - setup_remote_docker
+      - run:
+          name: Docker build and push
+          command: |
+            docker build -t ${PROJECT_NAME} -f ./build/Dockerfile.build .
+            docker tag ${PROJECT_NAME} eu.gcr.io/${GOOGLE_PROJECT_ID}/${PROJECT_NAME}:${CIRCLE_SHA1}
+            gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://eu.gcr.io
+            docker push eu.gcr.io/${GOOGLE_PROJECT_ID}/${PROJECT_NAME}:${CIRCLE_SHA1}
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
+            kubectl apply -f ${HOME}/patched_k8s.yml
+            kubectl rollout status deployment/${PROJECT_NAME}
 workflows:
   version: 2
-  ultimate_pipeline:
+  test_and_deploy:
     jobs:
-      - test
+      - install_dependencies_and_test
+      - deploy:
+          requires:
+            - install_dependencies_and_test
